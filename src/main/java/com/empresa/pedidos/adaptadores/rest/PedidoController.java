@@ -23,12 +23,23 @@ public class PedidoController {
     }
 
     @PostMapping
-    public ResponseEntity<Pedido> crear(@RequestBody Pedido pedido) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(fachadaPedidos.crearPedido(pedido));
+    public ResponseEntity<PedidoResponseDTO> crear(@RequestBody PedidoRequestDTO request) {
+        Pedido pedido = new Pedido(request.getTipo(), request.getSubtotal());
+        Pedido creado = fachadaPedidos.crearPedido(pedido);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(creado));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pedido> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.of(fachadaPedidos.buscarPorId(id));
+    public ResponseEntity<PedidoResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.of(fachadaPedidos.buscarPorId(id).map(PedidoController::toResponse));
+    }
+
+    private static PedidoResponseDTO toResponse(Pedido pedido) {
+        return new PedidoResponseDTO(
+                pedido.getId(),
+                pedido.getTipo(),
+                pedido.getSubtotal(),
+                pedido.getCosto(),
+                pedido.getEstado());
     }
 }

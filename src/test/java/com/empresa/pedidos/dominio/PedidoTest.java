@@ -20,8 +20,11 @@ class PedidoTest {
 
     @Test
     void rechazaSubtotalNegativoEIdentificadorInvalido() {
-        assertThrows(IllegalArgumentException.class,
-                () -> new Pedido(TipoPedido.ESTANDAR, new BigDecimal("-1.00")));
+        assertThrows(IllegalArgumentException.class, () -> crearPedidoConSubtotal(-1.00));
         assertThrows(IllegalArgumentException.class, () -> new PedidoId(0L));
+    }
+
+    private static void crearPedidoConSubtotal(double subtotal) {
+        new Pedido(TipoPedido.ESTANDAR, new BigDecimal(subtotal));
     }
 }
