@@ -10,7 +10,7 @@ import com.empresa.pedidos.aplicacion.ServicioPedidosLegacy;
 import com.empresa.pedidos.dominio.Pedido;
 
 @RestController
-@RequestMapping("/api/pedidos")
+@RequestMapping("/api/pedidos/legacy")
 public class PedidoLegacyController {
     private final ServicioPedidosLegacy servicio;
     public PedidoLegacyController(ServicioPedidosLegacy servicio) { this.servicio = servicio; }
