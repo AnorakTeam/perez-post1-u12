@@ -1,0 +1,19 @@
+# ADR-002: Factory + Strategy para selección de procesador
+
+## Estado
+Aceptado — 2026-06-2
+
+## Contexto
+Existen 3 tipos de pedido (Estandar, Express, Internacional) con algoritmos de cálculo distintos. Un switch en el servicio viola OCP y requiere modificación cada vez que se agrega un nuevo tipo.
+
+## Decisión
+Se usa el patrón Strategy (interfaz ProcesadorPedido con una implementación por tipo) combinado con Factory (mapa de instancias inyectadas por Spring) para selección en tiempo de ejecución.
+
+## Consecuencias
+Positivas:
+- Agregar un nuevo tipo de pedido es agregar una clase, no modificar el servicio central.
+- Cada procesador es testeable de forma independiente.
+
+Negativas:
+- Hay más clases que con un switch centralizado.
+- La selección implícita por mapa puede sorprender a desarrolladores nuevos.
