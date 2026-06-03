@@ -1,59 +1,78 @@
-# Refactorización Avanzada y Clean Code Profundo
+# Sistema de pedidos con arquitectura hexagonal, ArchUnit y CI/CD
 Estudiante: José Manuel Pérez Rodríguez
 Código: 1152375
 
-Desarrollo de la primera actividad de post contenido de la unidad 12 del curso Patrones de diseño.
+Este proyecto refleja la versión actual del sistema de pedidos después de la refactorización avanzada, la validación arquitectónica con ArchUnit y la integración de documentación técnica (ADR) y automatización con GitHub Actions.
 
 ### Contexto
-El estudiante implementa un sistema de gestión de pedidos en Spring Boot integrando cuatro patrones de diseño (Factory, Strategy, Observer y Facade), verifica el desacoplamiento entre capas con ArchUnit, y compara las métricas de calidad antes y después de la integración de patrones usando SonarQube.
+El sistema se desarrolla en Spring Boot con una arquitectura hexagonal que separa dominio, aplicación, adaptadores e infraestructura. Además de los patrones Factory, Strategy, Observer y Facade, se añadió una validación automática de reglas de arquitectura y documentación de decisiones de diseño en formato ADR.
 
-## Estado inicial del análisis
-| Categoría | Cantidad | Rating |
-|-----------|----------|--------|
-| Bugs | 0 | A |
-| Vulnerabilidades | 1 | D |
-| Code Smells | 2 | A |
-| issues | 0 | - |
-| Cobertura | 63.4% | — |
+## Estado actual del proyecto
+La versión actual incorpora:
+- refactorización del controlador legacy para evitar exponer la entidad JPA directamente,
+- reglas ArchUnit en src/test/java/com/empresa/pedidos/ReglasArquitectura.java,
+- ADRs en docs/adr/,
+- workflow de validación en .github/workflows/arquitectura.yml.
 
-## Análisis de calidad actualizado
-El análisis muestra mejoras en seguridad, confiabilidad y mantenimiento del código. Los comentarios y resultados son obtenidos directamente del dashboard.
-
-| Categoría | Resultado | Rating | Comentario |
-|-----------|-----------|--------|------------|
-| Vulnerabilities | 0 | A | Security rating is A when there are no vulnerabilities. |
-| Bugs | 0 | A | Reliability rating is A when there are no bugs. |
-| Code Smells | 1 | A | Maintainability rating is A when the technical debt ratio is less than 5.0%. |
-| Accepted issues | 0 | — | Valid issues that were not fixed. |
-| Coverage | 85.7% | — | On 161 new lines to cover. |
-| Duplications | 0.0% | — | On 1.2k lines. |
+La calidad del código se continúa evaluando con SonarQube y con las pruebas automatizadas del pipeline.
 
 ## Reflexión
 
-Este proyecto demuestra cómo la integración de los patrones Factory, Strategy, Observer y Facade mejora la organización del sistema de pedidos. Al separar responsabilidades entre capa de aplicación, dominio e infraestructura, el código se vuelve más fácil de mantener, probar y extender sin afectar el comportamiento general del sistema.
+Este proyecto demuestra cómo la integración de patrones de diseño, validación arquitectónica y documentación técnica mejora la organización del sistema de pedidos. La separación entre dominio, aplicación e infraestructura facilita el mantenimiento, las pruebas y la evolución del sistema sin introducir acoplamiento excesivo.
+
+## ADR añadidos
+Se documentaron tres decisiones clave en la carpeta docs/adr/:
+- ADR-001: Arquitectura Hexagonal para aislar el dominio.
+- ADR-002: Factory + Strategy para la selección del procesador.
+- ADR-003: Spring Events (Observer) para notificaciones.
+
+## Validacion Arquitectonica
+La validación automatizada se implementa en src/test/java/com/empresa/pedidos/ReglasArquitectura.java con cinco reglas ArchUnit:
+1. El dominio no debe depender de infraestructura ni adaptadores.
+2. Los controladores REST solo deben acceder a la fachada y al dominio, además de Spring Web y tipos Java.
+3. Los puertos del dominio deben ser interfaces.
+4. Los procesadores concretos deben implementar la interfaz ProcesadorPedido.
+5. La infraestructura no debe acceder directamente a la capa REST.
+
+Estas reglas se ejecutan como parte de la verificación del proyecto y también en CI mediante el workflow de GitHub Actions.
 
 ## Ejecución de código y pruebas
 
 ### Código
-
-Desde la raíz del proyecto (directorio donde está README.md)
+Desde la raíz del proyecto:
 
 ```bash
 ./mvnw spring-boot:run
 ```
-O también, utilizar la extensión de vscode "Extension Pack for Java" de Microsoft para autoconfiguración y ejecución simple.
 
-### Pruebas
-Para ejecución local con un servidor SonarQube en Docker:
+### Pruebas locales
+Ejecuta la validación arquitectónica y la suite completa con:
 
 ```bash
-mvn clean verify org.sonarsource.scanner.maven:sonar   -Dsonar.projectKey=com.empresa:   -Dsonar.projectName='pedidos'   -Dsonar.host.url=http://localhost:9000   -Dsonar.token={TOKEN_GENERADO_SONARQUBE}
+./mvnw -Dtest=ReglasArquitectura test
+./mvnw verify
 ```
 
-## Capturas del dashboard (actual)
+### Integración continua
+El workflow de GitHub Actions está definido en .github/workflows/arquitectura.yml y ejecuta:
+1. la validación de ArchUnit,
+2. la suite completa de pruebas con Maven.
 
-![Dashboard SonarQube fixed](docs/post1_after.png)
+### Análisis con SonarQube
+Para ejecutar el análisis en un servidor SonarQube local:
 
-## Capturas del dashboard (antes)
+```bash
+./mvnw clean verify org.sonarsource.scanner.maven:sonar \
+  -Dsonar.projectKey=com.empresa:pedidos \
+  -Dsonar.projectName='pedidos' \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token={TOKEN_GENERADO_SONARQUBE}
+```
 
-![Dashboard SonarQube](docs/post1_before.png)
+## Capturas de verificación
+
+> (Nota: se puede ver el check en verde al lado del mensaje del commit para confirmar que funciona el workflow de Actions)
+
+![Verificación de arquitectura y CI](docs/actions_failed.png)
+
+![Estado del proyecto](docs/post2_before.png)
